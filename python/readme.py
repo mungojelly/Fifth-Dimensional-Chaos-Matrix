@@ -56,7 +56,9 @@ Chaos Matrix][./!]  ([Which/That] [should/ought to] be [fairly/relatively] easy,
 [need/have] to do [anything/something] [coherent/predictable][./!])</p>
 
 <p>This [page/description] [changes/transforms] [each/every] time [it's/it is] 
-[viewed/reloaded][./!]  Its [code/source] [is/can be] [found/included] [at/with] [its/the] 
+[viewed/reloaded][./!]  Its <a 
+href="http://github.com/mungojelly/Fifth-Dimensional-Chaos-Matrix/blob/master/python/readme.py">
+[code/source]</a> [is included/can be found] [at/with] [its/the] 
 <a href="http://github.com/mungojelly/Fifth-Dimensional-Chaos-Matrix">GitHub project</a>[./!]
 </p>
 
