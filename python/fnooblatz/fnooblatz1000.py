@@ -22,6 +22,7 @@
 # 1000 interactively. 
 
 import random
+import collections
 
 def input_prompt():
     prompt = ""
@@ -41,36 +42,72 @@ class Fnooblatz1000(object):
     def __init__(self):
         self.reset_everything()
     def reset_everything(self):
-        self.display = [['*']]
+        empty_row = collections.deque()
+        empty_row.append('*')
+        self.display = collections.deque()
+        self.display.append(empty_row)
     def press_button(self,button_number):
         if button_number == 0:
-            # Resets everything.
-            #
-            # This functionality was desperately necessary 
-            # of course on actual Fnooblatz 1000s, which if 
-            # given difficult computations would overheat and 
-            # smoke furiously.  I don't think there's an FB1000 
-            # would have made it through the first night without 
-            # this button.  Hopefully on this simulator it 
-            # should be necessary slightly less desperately, 
-            # but it's still useful for getting out of any of 
-            # the confusing internal states a Fnooblatz is 
-            # prone to! 
             self.reset_everything()
             return
+        # Resets everything.
+        #
+        # This functionality was desperately necessary 
+        # of course on actual Fnooblatz 1000s, which if 
+        # given difficult computations would overheat and 
+        # smoke furiously.  I don't think there's an FB1000 
+        # would have made it through the first night without 
+        # this button.  Hopefully on this simulator it 
+        # should be necessary slightly less desperately, 
+        # but it's still useful for getting out of any of 
+        # the confusing internal states a Fnooblatz is 
+        # prone to! 
         if button_number == 1:
             for row in self.display:
                 row.append('*')
             return
         if button_number == 2:
-            new_row = []
+            new_row = collections.deque()
             for column in self.display[0]:
                 new_row.append('*')
             self.display.append(new_row)
             return
+        # The above commands to expand the Fnooblatz screen 
+        # are necessary because the display starts 1 pixel by 
+        # 1 pixel.  But why does it?  Well, besides the fact 
+        # that in the old days people would run their Fnooblatz 
+        # at as small a resolution as they actually needed, to 
+        # conserve energy, or that a cheap one-pixel display 
+        # would often be used to diagnose what's wrong with a 
+        # sick Fnooblatz (so it couldn't burn out a whole 
+        # expensive display), there's also the case of those 
+        # folks who would insist that they just didn't need 
+        # more than a one-pixel display to get by.  And it's 
+        # true, you can read the news quite adequately one 
+        # character at a time, if you're patient. 
+        if button_number == 3:
+            if len(self.display[0]) > 1:
+                for row in self.display:
+                    row.pop()
+            return
+        if button_number == 4:
+            if len(self.display) > 1:
+                self.display.pop()
+            return
+        # If you can make the display bigger, it's convenient 
+        # to be able to make it smaller too, instead of just 
+        # having to start all over! 
+        if button_number == 5:
+            for row in self.display:
+                row.rotate()
+            return
+        if button_number == 6:
+            self.display.rotate()
+            return
+
+        self.display[0][0] = '@' # Error signal for unpressableness. 
         # If we've reached this point, an unpressable button 
         # has been pressed. 
-        self.display[0][0] = '@' # Error signal for unpressableness. 
 
 def help_system():
     print """
@@ -113,6 +150,18 @@ Council.  It darn well ought to.
     if help_with == 2:
         print "Expands the Fnooblatz display by one row."
         return
+    if help_with == 3:
+        print "Contracts the Fnooblatz display by one column."
+        return
+    if help_with == 4:
+        print "Contracts the Fnooblatz display by one row."
+        return
+    if help_with == 5:
+        print "Moves everything on the display one column to the right."
+        return
+    if help_with == 6:
+        print "Moves everything on the display one row down."
+        return
     print "Never heard of that, sorry. :("
 
 class TestSuiteRunner(object):
@@ -137,12 +186,50 @@ class TestSuiteRunner(object):
         fnoo.press_button(99999) # This button should not exist.
         self.grade(fnoo.display[0][0] == '@',
                    "Pressed button 99999 but upperlefterrorsquare didn't turn into '@'.")
-        fnoo.press_button(1) # Attempt to expand Fnooblatz one column. 
+        fnoo.press_button(1) # Attempt to expand Fnooblatz display one column. 
         self.grade(len(fnoo.display[0]) == 2,
-                   "Pressing button 1 did not expand Fnooblatz by a column.")
-        fnoo.press_button(2) # Attempt to expand Fnooblatz one row.
+                   "Pressing button 1 did not expand Fnooblatz display by a column.")
+        fnoo.press_button(2) # Attempt to expand Fnooblatz display one row.
         self.grade(len(fnoo.display) == 2,
-                   "pressing button 2 did not expand Fnooblatz by a row.")
+                   "Pressing button 2 did not expand Fnooblatz display by a row.")
+        fnoo.press_button(3) # Attempt to contract Fnooblatz display one column.
+        self.grade(len(fnoo.display[0]) == 1,
+                   "Pressing button 3 did not contract Fnooblatz display by a column.")
+        fnoo.press_button(3) 
+        # Attempt to contract display by a column even though it's only one column 
+        # wide already (should leave it the same).
+        self.grade(len(fnoo.display[0]) == 1,
+                   "Pressing button 3 after Fnooblatz display "
+                   "was already 1 column changed width again.")
+        fnoo.press_button(4) # Attempt to contract Fnooblatz display one row.
+        self.grade(len(fnoo.display) == 1,
+                   "Pressing button 4 did not contract Fnooblatz display by a row.")
+        fnoo.press_button(4) 
+        # Attempt to contract display by a row even though it's only one row 
+        # long already (should leave it the same).
+        self.grade(len(fnoo.display) == 1,
+                   "Pressing button 4 after Fnooblatz display "
+                   "was already 1 row changed length again.")
+        fnoo.press_button(1)
+        fnoo.press_button(1)
+        fnoo.press_button(2)
+        fnoo.press_button(2) # Expand the Fnooblatz a little so we can move it around. 
+        self.grade(fnoo.display[0][0] == '@',
+                   "The @ isn't in the upperleft corner for some reason.")
+        fnoo.press_button(5) # Attempt to move display one column right. 
+        self.grade(fnoo.display[0][1] == '@',
+                   "Couldn't move the @ one right.")
+        self.grade(fnoo.display[0][0] == '*',
+                   "Upper left corner wasn't replaced with a * when the display moved right.")
+        fnoo.press_button(6) # Attempt to move display one row down. 
+        self.grade(fnoo.display[1][1] == '@',
+                   "Couldn't move the @ one row down.")
+        fnoo.press_button(99999) # Make a new @ 
+        self.grade(fnoo.display[0][0] == '@',
+                   "Couldn't make a new @")
+        fnoo.press_button(6) # Attempt to move down one row with new @
+        self.grade(fnoo.display[1][0] == '@',
+                   "Couldn't move new @ down one row.")
         print
         print "Passed", self.tests_score, "tests out of", self.total_tests, "!"
         print
