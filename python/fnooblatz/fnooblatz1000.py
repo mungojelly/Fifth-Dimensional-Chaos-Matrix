@@ -4,6 +4,11 @@
 # ________________
 #
 #
+# License: http://en.wikipedia.org/wiki/WTFPL
+#
+#
+# @ # * @ # * @ # * @ # * @ # * @ # * @# * @# * @#* @#*
+#
 #    In the Fabled and Far Away Land of Discordia, 
 # Discordian programmers toil day and night, producing 
 # programs in the infinite variety their varied and 
@@ -18,10 +23,13 @@
 # continue to be the slippery fundament of all the 
 # chaotic Discordian languages of today. 
 #
+# @ # * @ # * @ # * @ # * @ # * @# * @# * @#* @#*
+#
+#
 #     Run "python fnooblatz1000.py" to use a Fnooblatz
 # 1000 interactively. 
 
-import collections
+import collections 
 
 def input_prompt():
     return "this is the input prompt: "
