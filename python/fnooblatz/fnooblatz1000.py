@@ -21,32 +21,48 @@
 #     Run "python fnooblatz1000.py" to use a Fnooblatz
 # 1000 interactively. 
 
-import random
 import collections
 
 def input_prompt():
-    prompt = ""
-    for i in range(17):
-        prompt += random.choice(['!','@','#','$','%','^','&','*'])
-    prompt += ':'
-    return prompt
-
-def display_fnooblatz(fnoo):
-    for row in fnoo.display:
-        row_to_display = ""
-        for column in row:
-            row_to_display += column
-        print row_to_display
+    return "this is the input prompt: "
 
 class Fnooblatz1000(object):
     def __init__(self):
         self.reset_everything()
+    def printable_display(self):
+        printable = '\n'
+        for row in self.display:
+            for column in row:
+                printable += column
+            printable += '\n'
+        return printable
     def reset_everything(self):
         empty_row = collections.deque()
         empty_row.append('*')
         self.display = collections.deque()
         self.display.append(empty_row)
+        self.instructions_executed = []
+        self.alternator = True
+        self.cursor_row = 0
+        self.cursor_column = 0
+    def check_cursor_bounds(self):
+        if self.cursor_row < 0:
+            self.cursor_row = 0
+        if self.cursor_column < 0:
+            self.cursor_column = 0
+        while self.cursor_row >= len(self.display):
+            self.cursor_row -= 1
+        while self.cursor_column >= len(self.display[0]):
+            self.cursor_column -= 1
+    def execute_sequence(self,sequence):
+        for instruction in sequence:
+            self.press_button(instruction)
     def press_button(self,button_number):
+        self.instructions_executed.append(button_number)
+        if self.alternator:
+            self.alternator = False
+        else:
+            self.alternator = True
         if button_number == 0:
             self.reset_everything()
             return
@@ -89,10 +105,12 @@ class Fnooblatz1000(object):
             if len(self.display[0]) > 1:
                 for row in self.display:
                     row.pop()
+            self.check_cursor_bounds()
             return
         if button_number == 4:
             if len(self.display) > 1:
                 self.display.pop()
+            self.check_cursor_bounds()
             return
         # If you can make the display bigger, it's convenient 
         # to be able to make it smaller too, instead of just 
@@ -104,7 +122,40 @@ class Fnooblatz1000(object):
         if button_number == 6:
             self.display.rotate()
             return
-
+        # Rotating the display, which gives us just barely
+        # enough instructions to paint pictures! :D 
+        if button_number == 7:
+            return
+        # Button seven doesn't do anything, 'anything' that is
+        # except for all the stuff the Fnooblatz does every
+        # instruction (alternate the alternator, etc.)-- but,
+        # like, nothing EXTRA. 
+        if button_number == 8:
+            self.check_cursor_bounds()
+            if self.alternator:
+                self.display[self.cursor_row][self.cursor_column] = '|'
+            else:
+                self.display[self.cursor_row][self.cursor_column] = '-'
+            return
+        # This allows you to see the behavior of the alternator, 
+        # and combined with the following instructions to move the
+        # cursor can be useful for drawing. 
+        if button_number == 9:
+            if self.alternator:
+                self.cursor_row += 1
+            else:
+                self.cursor_row -= 1
+            self.check_cursor_bounds()
+            return
+        # The previous instruction allows you to go either up OR down!
+        if button_number == 10:
+            if self.alternator:
+                self.cursor_column += 1
+            else:
+                self.cursor_column -= 1
+            self.check_cursor_bounds()
+            return
+        # The previous instruction allows you to go either left OR right!
         self.display[0][0] = '@' # Error signal for unpressableness. 
         # If we've reached this point, an unpressable button 
         # has been pressed. 
@@ -161,6 +212,15 @@ Council.  It darn well ought to.
         return
     if help_with == 6:
         print "Moves everything on the display one row down."
+        return
+    if help_with == 7:
+        print "Doesn't do anything (except alternate the alternator, etc)."
+        return
+    if help_with == 8:
+        print "Outputs a | if the alternator is true and a - if it is false."
+        return
+    if help_with == 9:
+        print "Goes down if the alternator is true, and up if it is false."
         return
     print "Never heard of that, sorry. :("
 
@@ -230,6 +290,55 @@ class TestSuiteRunner(object):
         fnoo.press_button(6) # Attempt to move down one row with new @
         self.grade(fnoo.display[1][0] == '@',
                    "Couldn't move new @ down one row.")
+        fnoo.execute_sequence([0]) # Should reset everything! 
+        self.grade(len(fnoo.display) == 1, 
+                   "Tried to reset Fnooblatz by sending a sequence with just 0,"
+                   " but then display wasn't 1 row long.")
+        self.grade(fnoo.display[0][0] == '*',
+                   "Tried to reset Fnooblatz by sending a sequence with just 0,"
+                   " but then the upper left corner wasn't a *.")
+        fnoo.execute_sequence([1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 
+                               1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 
+                               9, 5, 9, 6, 6, 9, 6, 9, 6, 9, 6, 9, 6, 9, 6, 
+                               9, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 
+                               5, 5, 9, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 9, 6, 
+                               9, 6, 9, 6, 9, 6, 9, 6, 6, 6, 5, 5, 5, 5, 3, 
+                               3, 3, 3, 3, 3, 3, 3, 3, 4, 4, 4]) # Should draw an ! 
+        self.grade(fnoo.printable_display() == """
+********
+********
+***@@***
+***@@***
+***@@***
+***@@***
+***@@***
+***@@***
+********
+***@@***
+********
+********
+""", "Exclamation mark script printed out wrong.")
+        fnoo.press_button(7)
+        self.grade(fnoo.printable_display() == """
+********
+********
+***@@***
+***@@***
+***@@***
+***@@***
+***@@***
+***@@***
+********
+***@@***
+********
+********
+""", "Pressing 7 changed the exclamation mark picture.")
+        fnoo.press_button(0) # Reset, to reset the alternator. 
+        self.grade(fnoo.alternator, "Alternator didn't start True.")
+        fnoo.press_button(7) # Alternate the alternator. 
+        self.grade(fnoo.alternator == False, "Alternator didn't alternate to False.")
+        fnoo.press_button(7) # Alternate again.
+        self.grade(fnoo.alternator, "Alternator didn't alternate back to True.")
         print
         print "Passed", self.tests_score, "tests out of", self.total_tests, "!"
         print
@@ -242,14 +351,15 @@ def main():
     print "FNOOBLATZ 1000 ACTIVATED"
     print "________________________"
     print "type 'quit' to quit"
-    print "type 'help' for help"
+    print "type 'help' for help on the Fnooblatz buttons"
     print "type 'test' to test the simulator"
+    print "type 'print' to print a list of the instructions you've executed"
     print "otherwise, enter a number to simulate"
     print "pressing that button on the Fnooblatz 1000"
     print "________________________"
     while True:
         print
-        display_fnooblatz(fn)
+        print fn.printable_display()
         print
         input = raw_input(input_prompt())
         if input == 'quit':
@@ -263,6 +373,9 @@ def main():
         if input == 'test':
             tester = TestSuiteRunner()
             tester.run_test_suite(fn) # tests! sweet!
+            continue
+        if input == 'print':
+            print fn.instructions_executed
             continue
         if input.isdigit():
             fn.press_button(int(input))
