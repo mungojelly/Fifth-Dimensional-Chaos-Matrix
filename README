@@ -7,24 +7,23 @@ FIFTH DIMENSIONAL CHAOS MATRIX
 The Fifth Dimensional Chaos Matrix 
 is a Discordian programming project. 
 
-It doesn't do anything useful. 
+It doesn't do anything especially useful. 
 
-In fact, 
-as of this writing, 
-it does not do anything at all. 
-
-(What it is supposed to do eventually 
+What it is supposed to do eventually 
 is to be a series of esoteric languages,
-   (simulators? environments? agents?) 
+(simulators? environments? agents?) 
 built one upon the other.  Which still 
 won't be useful, but might be --
-interesting?) 
+interesting? 
 
 So far there is just one component 
-started, the FNOOBLATZ1000.  So far, 
-all you can do is enlarge the display 
-area of the Fnooblatz, on which it does 
-not know how to display anything.  Enjoy! 
+started, the FNOOBLATZ1000.  It now 
+knows a dozen commands, enough that 
+it's possible to draw simple pictures. 
+It's difficult to get it to do 
+anything on purpose, but it does look 
+pretty if you just hook it up to a 
+stream of random numbers! 
 
 Write to me at mungojelly@gmail.com 
 if you'd like to contribute a component. 
