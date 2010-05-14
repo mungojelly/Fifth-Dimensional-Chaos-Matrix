@@ -156,9 +156,10 @@ class Fnooblatz1000(object):
             self.check_cursor_bounds()
             return
         # The previous instruction allows you to go either left OR right!
-        self.display[0][0] = '@' # Error signal for unpressableness. 
-        # If we've reached this point, an unpressable button 
-        # has been pressed. 
+        self.display[0][0] = '@' 
+        # Error signal for unpressableness, 
+        # since if we've reached this point, 
+        # an unpressable button has been pressed! 
 
 def help_system():
     print """
@@ -341,6 +342,7 @@ class TestSuiteRunner(object):
         self.grade(fnoo.alternator == False, "Alternator didn't alternate to False.")
         fnoo.press_button(7) # Alternate again.
         self.grade(fnoo.alternator, "Alternator didn't alternate back to True.")
+        fnoo.press_button(0) # Leave the Fnooblatz clean! 
         print
         print "Passed", self.tests_score, "tests out of", self.total_tests, "!"
         print
@@ -348,13 +350,14 @@ class TestSuiteRunner(object):
 def main():
     print "..bleep....bloop....blap.."
     fn = Fnooblatz1000()
+    tester = TestSuiteRunner()
+    tester.run_test_suite(fn) # tests! sweet!
     print "________________________"
     print
     print "FNOOBLATZ 1000 ACTIVATED"
     print "________________________"
     print "type 'quit' to quit"
     print "type 'help' for help on the Fnooblatz buttons"
-    print "type 'test' to test the simulator"
     print "type 'print' to print a list of the instructions you've executed"
     print "otherwise, enter a number to simulate"
     print "pressing that button on the Fnooblatz 1000"
@@ -371,10 +374,6 @@ def main():
             print 
             print "..returning from help system"
             print "||.........................."
-            continue
-        if input == 'test':
-            tester = TestSuiteRunner()
-            tester.run_test_suite(fn) # tests! sweet!
             continue
         if input == 'print':
             print fn.instructions_executed
