@@ -164,6 +164,11 @@ class Fnooblatz1000(object):
             self.check_cursor_bounds()
             return
         # The previous instruction allows you to go either left OR right!
+        if button_number == 11:
+            self.check_cursor_bounds()
+            self.display[self.cursor_row][self.cursor_column] = ' '
+            return
+        # Spaces.      Ah.          Relaxing. 
         self.display[0][0] = '@' 
         # Error signal for unpressableness, 
         # since if we've reached this point, 
@@ -230,6 +235,12 @@ Council.  It darn well ought to.
         return
     if help_with == 9:
         print "Goes down if the alternator is true, and up if it is false."
+        return
+    if help_with == 10:
+        print "Goes right if the alternator is true, and left if it is false."
+        return
+    if help_with == 11:
+        print "Prints a relaxing space at the cursor."
         return
     print "Never heard of that, sorry. :("
 

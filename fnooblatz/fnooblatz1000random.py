@@ -28,15 +28,22 @@ DIST_BEGIN_ALT_NO_LR = [5,6,7,7,7,7,7,8,8,8,8,8,9,9,9,9,9,99999]
 DIST_BEGIN_ALT_NO_AT_NO_LR = [5,6,7,7,7,7,7,8,8,8,8,8,9,9,9,9,9]
 DIST_NO_MOVE = [8,9,10]
 DIST_NO_MOVE_PAUSE = [7,8,9,10]
+SPACEY = [11,11,11,11,11,11,11,11,11,11,11,11,11,11,5,6,7,8,8,8,9,10]
+SPACEY_NO_MOVE = [11,11,11,11,11,11,11,11,11,11,11,11,11,11,7,8,8,8,9,10]
+SPACEY_NO_LR = [11,11,11,11,11,11,11,11,11,11,11,11,11,11,6,7,8,8,8,9,10]
+SPACEY_NO_UPDOWN = [11,11,11,11,11,11,11,11,11,11,11,11,11,11,5,7,8,8,8,9,10]
 DISTRIBUTIONS = [DIST_BEGIN, DIST_BEGIN_NO_AT, 
                  DIST_BEGIN_ALT, DIST_BEGIN_ALT_NO_AT,
                  DIST_BEGIN_NO_LR, DIST_BEGIN_NO_AT_NO_LR,
                  DIST_BEGIN_ALT_NO_LR, DIST_BEGIN_ALT_NO_AT_NO_LR,
-                 DIST_NO_MOVE, DIST_NO_MOVE_PAUSE]
+                 DIST_NO_MOVE, DIST_NO_MOVE_PAUSE,
+                 SPACEY, SPACEY_NO_MOVE, SPACEY_NO_LR,
+                 SPACEY_NO_UPDOWN]
 
 import fnooblatz1000
-import random
+
 import curses
+import random
 import time
 
 def print_fnooblatz(fnoo,stdscr):
