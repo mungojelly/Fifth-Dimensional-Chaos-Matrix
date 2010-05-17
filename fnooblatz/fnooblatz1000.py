@@ -49,6 +49,19 @@ class Fnooblatz1000(object):
             for x in range(len(self.display[y])):
                 stdscr.addch(y,x,ord(self.display[y][x]))
         stdscr.refresh()
+    # At the moment set_width and set_height are 
+    # rather naive, and will hang on negative numbers, 
+    # for instance. 
+    def set_width(self,width):
+        while len(self.display[0]) > width:
+            self.press_button(3)
+        while len(self.display[0]) < width:
+            self.press_button(1)
+    def set_height(self,height):
+        while len(self.display) > height:
+            self.press_button(4)
+        while len(self.display) < height:
+            self.press_button(2)
     def reset_everything(self):
         empty_row = collections.deque()
         empty_row.append('*')

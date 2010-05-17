@@ -9,8 +9,8 @@
 # the display to a reasonable size and then sends random 
 # commands.  I think it's pretty. 
 
-WIDTH_OF_DISPLAY = 60
-HEIGHT_OF_DISPLAY = 20
+DISPLAY_WIDTH = 60
+DISPLAY_HEIGHT = 20
 MIN_SEQUENCE_LENGTH = 1
 MAX_SEQUENCE_LENGTH = 5000
 RESET_TIME = 17
@@ -55,10 +55,8 @@ def random_sequence():
 
 def reset_fnooblatz(fnoo):
     fnoo.press_button(0)
-    for x in range(WIDTH_OF_DISPLAY):
-        fnoo.press_button(1)
-    for y in range(HEIGHT_OF_DISPLAY):
-        fnoo.press_button(2)
+    fnoo.set_width(DISPLAY_WIDTH)
+    fnoo.set_height(DISPLAY_HEIGHT)
 
 def main(stdscr):
     curses.curs_set(0)
