@@ -44,6 +44,11 @@ class Fnooblatz1000(object):
                 printable += column
             printable += '\n'
         return printable
+    def print_curses(self,stdscr):
+        for y in range(len(self.display)):
+            for x in range(len(self.display[y])):
+                stdscr.addch(y,x,ord(self.display[y][x]))
+        stdscr.refresh()
     def reset_everything(self):
         empty_row = collections.deque()
         empty_row.append('*')

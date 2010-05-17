@@ -46,12 +46,6 @@ import curses
 import random
 import time
 
-def print_fnooblatz(fnoo,stdscr):
-    for y in range(len(fnoo.display)):
-        for x in range(len(fnoo.display[y])):
-            stdscr.addch(y,x,ord(fnoo.display[y][x]))
-    stdscr.refresh()
-
 def random_sequence():
     sequence = []
     distribution = random.choice(DISTRIBUTIONS)
@@ -84,7 +78,7 @@ def main(stdscr):
             sequence = random_sequence()
         if time.time() - display_refreshed > REFRESH_TIME:
             display_refreshed = time.time()
-            print_fnooblatz(fnoo,stdscr)
+            fnoo.print_curses(stdscr)
 
 if __name__ == "__main__":
     curses.wrapper(main)
