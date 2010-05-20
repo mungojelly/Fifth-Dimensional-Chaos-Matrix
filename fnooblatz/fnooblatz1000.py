@@ -67,7 +67,7 @@ class Fnooblatz1000(object):
         empty_row.append('*')
         self.display = collections.deque()
         self.display.append(empty_row)
-        self.instructions_executed = []
+        self.instructions_executed = collections.deque()
         self.alternator = True
         self.cursor_row = 0
         self.cursor_column = 0
@@ -85,6 +85,8 @@ class Fnooblatz1000(object):
             self.press_button(instruction)
     def press_button(self,button_number):
         self.instructions_executed.append(button_number)
+        if len(self.instructions_executed) > 1024:
+            self.instructions_executed.popleft()
         if self.alternator:
             self.alternator = False
         else:
