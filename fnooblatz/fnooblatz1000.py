@@ -31,9 +31,6 @@
 
 import collections 
 
-def input_prompt():
-    return "this is the input prompt: "
-
 class Fnooblatz1000(object):
     def __init__(self):
         self.reset_everything()
@@ -207,7 +204,7 @@ ELP SYST
 EM!!!!!!
 ________
 """
-    help_with = raw_input(input_prompt())
+    help_with = raw_input("HELP: ")
     print
     if help_with.isdigit():
         help_with = int(help_with)
@@ -405,7 +402,7 @@ def main():
         print
         print fn.printable_display()
         print
-        input = raw_input(input_prompt())
+        input = raw_input("FNOOBLATZ1000: ")
         if input == 'quit':
             break
         if input == 'help':
