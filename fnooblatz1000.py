@@ -29,7 +29,9 @@
 #     Run "python fnooblatz1000.py" to use a Fnooblatz
 # 1000 interactively. 
 
+
 import collections 
+from doohickey import Doohickey
 
 class Fnooblatz1000(object):
     def __init__(self):
@@ -69,10 +71,11 @@ class Fnooblatz1000(object):
         empty_row.append('*')
         self.display = collections.deque()
         self.display.append(empty_row)
-        self.instructions_executed = collections.deque()
+        self.instructions_executed = collections.deque() 
         self.alternator = True
         self.cursor_row = 0
         self.cursor_column = 0
+        self.doohickey = Doohickey()
     def check_cursor_bounds(self):
         if self.cursor_row < 0:
             self.cursor_row = 0
@@ -191,6 +194,21 @@ class Fnooblatz1000(object):
             self.display[self.cursor_row][self.cursor_column] = ' '
             return
         # Spaces.      Ah.          Relaxing. 
+        if button_number == 12:
+            self.display[self.cursor_row][self.cursor_column] = self.doohickey.other()
+            return
+        # The Fnooblatz1000 contains a simple interface 
+        # to access its contained Doohickey!  This presses 
+        # the 'other' button on the Doohickey and prints 
+        # the result. 
+        if button_number == 13:
+            self.display[self.cursor_row][self.cursor_column] = self.doohickey.a()
+            return
+        if button_number == 14:
+            self.display[self.cursor_row][self.cursor_column] = self.doohickey.b()
+            return
+        # With these you can use the Doohickey to write 'a' and 
+        # 'b', which is useful for talking about ABBA! 
         self.display[0][0] = '@' 
         # Error signal for unpressableness, 
         # since if we've reached this point, 
@@ -263,6 +281,15 @@ Council.  It darn well ought to.
         return
     if help_with == 11:
         print "Prints a relaxing space at the cursor."
+        return
+    if help_with == 12:
+        print "Prints the result of pressing the Doohickey's 'other' button at cursor."
+        return
+    if help_with == 13:
+        print "Prints the result of pressing the Doohickey's 'a' button at cursor."
+        return
+    if help_with == 14:
+        print "Prints the result of pressing the Doohickey's 'b' button at cursor."
         return
     print "Never heard of that, sorry. :("
 
@@ -407,6 +434,25 @@ class TestSuiteRunner(object):
 -|-
  | 
 """, "Failed at drawing a little cross.")
+        fnoo.press_button(0) # OK start again.
+        fnoo.execute_sequence([1, 2, 7, 9, 7, 10, 12]) # Print 'b' in the lower right corner. 
+        self.grade(fnoo.display[1][1] == 'b',
+                   "Pressing button 12 to press 'other' on the Doohickey didn't print 'b'.")
+        fnoo.press_button(13)
+        self.grade(fnoo.display[1][1] == 'a',
+                   "Pressing button 13 didn't write an 'a'.")
+        fnoo.press_button(14)
+        self.grade(fnoo.display[1][1] == 'b',
+                   "Pressing button 14 didn't write a 'b'.")
+        fnoo.press_button(12)
+        self.grade(fnoo.display[1][1] == 'a',
+                   "Pressing button 12 to press 'other' didn't print 'a' after 'b'.")
+        fnoo.press_button(0) 
+        fnoo.execute_sequence([1, 1, 1, 12, 12, 12, 6, 5, 12, 5, 12, 5, 12, 5, 12, 12, 5, 5, 5, 12, 5, 13, 5, 13, 14, 5, 13, 5, 13, 5, 14, 5, 5, 2, 6, 14, 5, 13, 5, 13, 5, 14, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5])
+        self.grade(fnoo.printable_display() == """
+abba
+aabb
+""", "Wasn't able to use the Doohickey to write about ABBA.")
         fnoo.press_button(0) # Leave the Fnooblatz clean! 
         print
         print "Passed", self.tests_score, "tests out of", self.total_tests, "!"
