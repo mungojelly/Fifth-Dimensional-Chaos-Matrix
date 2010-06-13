@@ -431,7 +431,10 @@ def main():
         print
         print fn.printable_display()
         print
-        input = raw_input("FNOOBLATZ1000: ")
+        prompt = "Alt: " + str(fn.alternator) + \
+            " Row: " + str(fn.cursor_row) + \
+            " Col: " + str(fn.cursor_column) + " >-> "
+        input = raw_input(prompt)
         if input == 'quit':
             break
         if input == 'help':
