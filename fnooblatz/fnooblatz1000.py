@@ -383,6 +383,30 @@ class TestSuiteRunner(object):
         self.grade(fnoo.alternator == False, "Alternator didn't alternate to False.")
         fnoo.press_button(7) # Alternate again.
         self.grade(fnoo.alternator, "Alternator didn't alternate back to True.")
+        fnoo.press_button(0) # Clean up to draw something new.
+        fnoo.execute_sequence([1,1,2,2]) # Expand to 3x3.
+        self.grade(len(fnoo.display) == 3, 
+                   "Sequence [1,1,2,2] didn't expand Fnooblatz to three rows long.")
+        self.grade(len(fnoo.display[0]) == 3,
+                   "Sequence [1,1,2,2] didn't expand Fnooblatz to three columns wide.")
+        fnoo.press_button(11)
+        self.grade(fnoo.display[0][0] == ' ',
+                   "Pressing 11 didn't make a space.")
+        fnoo.execute_sequence([9,8,9,11]) # These 9s should go down. 
+        self.grade(fnoo.display[1][0] == '-',
+                   "Couldn't go down with 9 and paint '-' on the left.")
+        fnoo.execute_sequence([10,8]) # Go right and write '|'.
+        self.grade(fnoo.display[2][1] == '-',
+                   "Couldn't go right with 10 and then paint '-'.")
+        fnoo.press_button(8)
+        self.grade(fnoo.display[2][1] == '|',
+                   "Pressing 8 again didn't paint '|' instead of '-'.")
+        fnoo.execute_sequence([9,8,9,8,7,10,11,9,8,9,11])
+        self.grade(fnoo.printable_display() == """
+ | 
+-|-
+ | 
+""", "Failed at drawing a little cross.")
         fnoo.press_button(0) # Leave the Fnooblatz clean! 
         print
         print "Passed", self.tests_score, "tests out of", self.total_tests, "!"
