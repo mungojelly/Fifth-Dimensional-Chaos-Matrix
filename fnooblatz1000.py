@@ -80,6 +80,7 @@ class Fnooblatz1000(object):
         self.cursor_column = 0
         self.rotation_direction = 1
         self.doohickey = Doohickey()
+        self.remembered_character = ' '
     def check_cursor_bounds(self):
         if self.cursor_row < 0:
             self.cursor_row = 0
@@ -288,6 +289,16 @@ class Fnooblatz1000(object):
             return
         # Allows you to switch to rotating the display in the 
         # opposite direction.  This might make you less dizzy.
+        if button_number == 23:
+            self.check_cursor_bounds()
+            self.remembered_character = self.display[self.cursor_row][self.cursor_column]
+            return
+        if button_number == 24:
+            self.check_cursor_bounds()
+            self.display[self.cursor_row][self.cursor_column] = self.remembered_character
+            return
+        # Allows you to remember a character for a little 
+        # while.  Useful for smearing things around! 
         self.display[0][0] = '@' 
         # Error signal for unpressableness, 
         # since if we've reached this point, 
@@ -388,6 +399,12 @@ ________
         return
     if help_with == 22:
         print "Reverses the rotation direction."
+        return
+    if help_with == 23:
+        print "Remembers the character at cursor."
+        return
+    if help_with == 24:
+        print "Prints the remembered character."
         return
     print "Never heard of that, sorry. :("
 
@@ -639,6 +656,19 @@ b
 *|-*
 ****
 """, "Couldn't move swirl to the middle by reversing rotation direction.")
+        fnoo.press_button(0)
+        fnoo.execute_sequence([1,14,19,13,2])
+        fnoo.press_button(23) # Should remember an 'a'.
+        fnoo.execute_sequence([21,18])
+        fnoo.press_button(24) # Should paint the remembered 'a'.
+        fnoo.press_button(20)
+        fnoo.press_button(23) # Should remember a 'b'.
+        fnoo.execute_sequence([21,19])
+        fnoo.press_button(24) # Should paint the remembered 'b'.
+        self.grade(fnoo.printable_display() == """
+ba
+ab
+""", "Couldn't remember characters and repaint them.")
         fnoo.press_button(0) # Leave the Fnooblatz clean! 
         print
         print "Passed", self.tests_score, "tests out of", self.total_tests, "!"
