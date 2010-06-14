@@ -115,7 +115,15 @@ class RandomRunner(object):
     def random_sequence(self,distribution,min_length,max_length):
         sequence = []
         for i in range(random.randint(min_length,max_length)):
-            sequence.append(random.choice(distribution))
+            next_number = random.choice(distribution)
+            # Half of the time, filter out display movement.
+            if random.choice([True, False]):
+                if (next_number != 5) and (next_number != 6):
+                    sequence.append(next_number)
+                else:
+                    sequence.append(7)
+            else:
+                sequence.append(next_number)
         return sequence
     def new_sequence(self):
         self.sequence = self.random_sequence(random.choice(DISTRIBUTIONS),
