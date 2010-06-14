@@ -247,6 +247,11 @@ class Fnooblatz1000(object):
         # Toggles background processing.  If it's turned 
         # on it will start quite immediately, before the 
         # next instruction. 
+        if button_number == 17:
+            self.cursor_row = 0
+            self.cursor_column = 0
+            return
+        # An orderly instruction for finding one's place.
         self.display[0][0] = '@' 
         # Error signal for unpressableness, 
         # since if we've reached this point, 
@@ -329,6 +334,9 @@ ________
         return
     if help_with == 16:
         print "Toggles background processing on and off."
+        return
+    if help_with == 17:
+        print "Moves the cursor to the upper left corner."
         return
     print "Never heard of that, sorry. :("
 
@@ -507,6 +515,15 @@ aabb
         fnoo.execute_sequence([7,7,7,7]) # Actual NOP.
         self.grade(fnoo.display[0][0] == '-',
                    "Background processing wouldn't stop.")
+        fnoo.press_button(0)
+        fnoo.execute_sequence([1,1,1,1,1,10,8,10,8,10,8,10,8,10,8])
+        self.grade(fnoo.printable_display() == """
+*-----
+""", "Couldn't write a line of dashes.")
+        fnoo.press_button(17) # Should go to upper left corner.
+        fnoo.press_button(8)
+        self.grade(fnoo.display[0][0] == '-',
+                   "Couldn't paint dash in upper left corner by pressing 17.")
         fnoo.press_button(0) # Leave the Fnooblatz clean! 
         print
         print "Passed", self.tests_score, "tests out of", self.total_tests, "!"
