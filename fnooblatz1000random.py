@@ -9,13 +9,15 @@
 # the display to a reasonable size and then sends random 
 # commands.  I think it's pretty. 
 
-DISPLAY_WIDTH = 60
-DISPLAY_HEIGHT = 20
 MIN_SEQUENCE_LENGTH = 1
 MAX_SEQUENCE_LENGTH = 5000
+MIN_BACKGROUND_SEQUENCE_LENGTH = 1
+MAX_BACKGROUND_SEQUENCE_LENGTH = 5000
 RESET_TIME = 17
 REPEAT_TIME = 1.7
 REFRESH_TIME = 0.17
+ALWAYS_BACKGROUNDING = True
+NEVER_BACKGROUNDING = False
 
 # Various distributions, for variety: 
 DIST_BEGIN = [5,6,7,8,9,10,99999]
@@ -50,43 +52,80 @@ DISTRIBUTIONS = [DIST_BEGIN, DIST_BEGIN_NO_AT,
                  SPARSELY_ABISH, VERY_SPARSELY_ABISH,
                  ONLY_A, ONLY_B]
 
+# Some distributions for using the background processor. 
+BACKGROUNDER = [8,8,8,11,11,11,99999]
+SPACER_OUT = [11,11,11,7,7,7]
+A_BACKGROUND = [7,7,7,7,7,7,7,7,7,7,13,13]
+B_BACKGROUND = [7,7,7,7,7,7,7,7,7,7,14,14]
+BG_ATER = [7,7,7,7,7,7,99999]
+BG_CURSOR = [7,7,7,7,7,9,10]
+BACKGROUND_DISTRIBUTIONS = [BACKGROUNDER, SPACER_OUT, 
+                            A_BACKGROUND, B_BACKGROUND, BG_ATER,
+                            BG_CURSOR]
+
 import fnooblatz1000
 
 import curses
 import random
 import time
 
-def random_sequence():
-    sequence = []
-    distribution = random.choice(DISTRIBUTIONS)
-    for i in range(random.randint(MIN_SEQUENCE_LENGTH,MAX_SEQUENCE_LENGTH)):
-        sequence.append(random.choice(distribution))
-    return sequence
-
-def reset_fnooblatz(fnoo):
-    fnoo.press_button(0)
-    fnoo.set_width(DISPLAY_WIDTH)
-    fnoo.set_height(DISPLAY_HEIGHT)
+class RandomRunner(object):
+    def __init__(self,fnooblatz,stdscr):
+        self.fnoo = fnooblatz
+        self.stdscr = stdscr
+    def reset_fnooblatz(self):
+        self.fnoo.press_button(0)
+        backgrounding = random.choice([True, False])
+        if ALWAYS_BACKGROUNDING:
+            backgrounding = True
+        if NEVER_BACKGROUNDING:
+            backgrounding = False
+        if backgrounding:
+            background_distribution = random.choice(BACKGROUND_DISTRIBUTIONS)
+            background_sequence = self.random_sequence(background_distribution,
+                                                       MIN_BACKGROUND_SEQUENCE_LENGTH,
+                                                       MAX_BACKGROUND_SEQUENCE_LENGTH)
+            self.fnoo.execute_sequence(background_sequence)
+            self.fnoo.press_button(15) # Store it.
+            self.fnoo.press_button(16) # Start it.
+    def random_sequence(self,distribution,min_length,max_length):
+        sequence = []
+        for i in range(random.randint(min_length,max_length)):
+            sequence.append(random.choice(distribution))
+        return sequence
+    def new_sequence(self):
+        self.sequence = self.random_sequence(random.choice(DISTRIBUTIONS),
+                                             MIN_SEQUENCE_LENGTH,
+                                             MAX_SEQUENCE_LENGTH)
+    def run_forever(self):
+        self.reset_fnooblatz()
+        fnooblatz_reset = time.time()
+        self.new_sequence()
+        sequence_changed = time.time()
+        self.fnoo.print_curses(self.stdscr)
+        display_refreshed = time.time()
+        while True:
+            self.fnoo.execute_sequence(self.sequence)
+            if time.time() - fnooblatz_reset > RESET_TIME:
+                self.reset_fnooblatz()
+                fnooblatz_reset = time.time()
+            if time.time() - sequence_changed > REPEAT_TIME:
+                self.new_sequence()
+                sequence_changed = time.time()
+            if time.time() - display_refreshed > REFRESH_TIME:
+                (maxy, maxx) = self.stdscr.getmaxyx()
+                self.height = maxy - 1
+                self.width = maxx - 1
+                self.fnoo.set_width(self.width)
+                self.fnoo.set_height(self.height)
+                self.fnoo.print_curses(self.stdscr)
+                display_refreshed = time.time()
 
 def main(stdscr):
     curses.curs_set(0)
     fnoo = fnooblatz1000.Fnooblatz1000()
-    reset_fnooblatz(fnoo)
-    fnooblatz_reset = time.time()
-    sequence_changed = time.time()
-    display_refreshed = time.time()
-    sequence = random_sequence()
-    while True:
-        fnoo.execute_sequence(sequence)
-        if time.time() - fnooblatz_reset > RESET_TIME:
-            fnooblatz_reset = time.time()
-            reset_fnooblatz(fnoo)
-        if time.time() - sequence_changed > REPEAT_TIME:
-            sequence_changed = time.time()
-            sequence = random_sequence()
-        if time.time() - display_refreshed > REFRESH_TIME:
-            display_refreshed = time.time()
-            fnoo.print_curses(stdscr)
+    random_runner = RandomRunner(fnoo,stdscr)
+    random_runner.run_forever()
 
 if __name__ == "__main__":
     curses.wrapper(main)

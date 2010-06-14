@@ -71,7 +71,10 @@ class Fnooblatz1000(object):
         empty_row.append('*')
         self.display = collections.deque()
         self.display.append(empty_row)
-        self.instructions_executed = collections.deque() 
+        self.buttons_pressed = collections.deque()
+        self.background_instructions = collections.deque()
+        self.background_current_instruction = -1 # So it starts at zero. 
+        self.background_processing_on = False
         self.alternator = True
         self.cursor_row = 0
         self.cursor_column = 0
@@ -88,14 +91,30 @@ class Fnooblatz1000(object):
     def execute_sequence(self,sequence):
         for instruction in sequence:
             self.press_button(instruction)
+    def execute_background_instruction(self):
+        if len(self.background_instructions) < 1:
+            return # If there are no instructions, there's nothing to do. 
+        self.background_current_instruction += 1
+        if self.background_current_instruction >= len(self.background_instructions):
+            self.background_current_instruction = 0
+        instruction = \
+            self.background_instructions[self.background_current_instruction]
+        self.execute_single_instruction(instruction)
     def press_button(self,button_number):
-        self.instructions_executed.append(button_number)
-        if len(self.instructions_executed) > 1024:
-            self.instructions_executed.popleft()
+        self.buttons_pressed.append(button_number)
+        if len(self.buttons_pressed) > 1024:
+            self.buttons_pressed.popleft()
         if self.alternator:
             self.alternator = False
         else:
             self.alternator = True
+        # The alternator, as you can see, alternates 
+        # BEFORE each instruction is executed.  Confusing
+        # but true! 
+        self.execute_single_instruction(button_number)
+        if self.background_processing_on:
+            self.execute_background_instruction()
+    def execute_single_instruction(self,button_number):
         if button_number == 0:
             self.reset_everything()
             return
@@ -209,6 +228,25 @@ class Fnooblatz1000(object):
             return
         # With these you can use the Doohickey to write 'a' and 
         # 'b', which is useful for talking about ABBA! 
+        if button_number == 15:
+            self.buttons_pressed.pop() # Otherwise it gets weird.
+            self.background_instructions = self.buttons_pressed
+            self.background_current_instruction = -1 # So we start at zero.
+            self.buttons_pressed = collections.deque()
+            return
+        # Moves what you've done recently to the background, 
+        # where it will continue to happen as you go on doing 
+        # other things.  Fun! 
+        if button_number == 16:
+            self.buttons_pressed.pop() # Otherwise it gets weird.
+            if self.background_processing_on:
+                self.background_processing_on = False
+            else:
+                self.background_processing_on = True
+            return
+        # Toggles background processing.  If it's turned 
+        # on it will start quite immediately, before the 
+        # next instruction. 
         self.display[0][0] = '@' 
         # Error signal for unpressableness, 
         # since if we've reached this point, 
@@ -238,13 +276,8 @@ ________
     if help_with == 'help':
         print "Helps you with things, like I've just helped you!"
         return
-    if help_with == 'test':
-        print """
-Runs a series of tests on the Fnooblatz 1000 simulator, 
-to see if it matches the specification specified for 
-Fnooblatz 1000s by the Fnooblatz 1000 Specification 
-Council.  It darn well ought to.
-"""
+    if help_with == 'print':
+        print "Prints a list of the buttons you've pressed, since resetting or moving the list."
         return
     if help_with == 0:
         print "Resets everything!!!"
@@ -290,6 +323,12 @@ Council.  It darn well ought to.
         return
     if help_with == 14:
         print "Prints the result of pressing the Doohickey's 'b' button at cursor."
+        return
+    if help_with == 15:
+        print "Moves recently pressed buttons to background instruction list."
+        return
+    if help_with == 16:
+        print "Toggles background processing on and off."
         return
     print "Never heard of that, sorry. :("
 
@@ -453,6 +492,21 @@ class TestSuiteRunner(object):
 abba
 aabb
 """, "Wasn't able to use the Doohickey to write about ABBA.")
+        fnoo.press_button(0) 
+        # OK now we'll test the background processing.
+        fnoo.press_button(8)
+        fnoo.press_button(15) # Put a blinker in the background.
+        fnoo.press_button(16) # Start processing, 
+        fnoo.press_button(7) # NOP, which should change it to a '|'.
+        self.grade(fnoo.display[0][0] == '|',
+                   "Wasn't able to run an instruction in the background.")
+        fnoo.press_button(7) # NOP, which should change it again.
+        self.grade(fnoo.display[0][0] == '-',
+                   "Background twinkle didn't twinkle.")
+        fnoo.press_button(16) # Stop processing.
+        fnoo.execute_sequence([7,7,7,7]) # Actual NOP.
+        self.grade(fnoo.display[0][0] == '-',
+                   "Background processing wouldn't stop.")
         fnoo.press_button(0) # Leave the Fnooblatz clean! 
         print
         print "Passed", self.tests_score, "tests out of", self.total_tests, "!"
@@ -469,7 +523,7 @@ def main():
     print "________________________"
     print "type 'quit' to quit"
     print "type 'help' for help on the Fnooblatz buttons"
-    print "type 'print' to print a list of the instructions you've executed"
+    print "type 'print' to print a list of the buttons recently pressed"
     print "otherwise, enter a number to simulate"
     print "pressing that button on the Fnooblatz 1000"
     print "________________________"
@@ -490,7 +544,7 @@ def main():
             print "||.........................."
             continue
         if input == 'print':
-            print fn.instructions_executed
+            print fn.buttons_pressed
             continue
         if input.isdigit():
             fn.press_button(int(input))
