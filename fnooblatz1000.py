@@ -78,6 +78,7 @@ class Fnooblatz1000(object):
         self.alternator = True
         self.cursor_row = 0
         self.cursor_column = 0
+        self.rotation_direction = 1
         self.doohickey = Doohickey()
     def check_cursor_bounds(self):
         if self.cursor_row < 0:
@@ -169,10 +170,10 @@ class Fnooblatz1000(object):
         # having to start all over! 
         if button_number == 5:
             for row in self.display:
-                row.rotate()
+                row.rotate(self.rotation_direction)
             return
         if button_number == 6:
-            self.display.rotate()
+            self.display.rotate(self.rotation_direction)
             return
         # Rotating the display, which gives us just barely
         # enough instructions to paint pictures! :D 
@@ -279,6 +280,14 @@ class Fnooblatz1000(object):
         # The above instructions allow you to travel easily in 
         # all four directions, while also allowing you to safely 
         # contain yourself in a box-- or a maze perhaps!
+        if button_number == 22:
+            if self.rotation_direction == 1:
+                self.rotation_direction = -1
+            else:
+                self.rotation_direction = 1
+            return
+        # Allows you to switch to rotating the display in the 
+        # opposite direction.  This might make you less dizzy.
         self.display[0][0] = '@' 
         # Error signal for unpressableness, 
         # since if we've reached this point, 
@@ -327,10 +336,10 @@ ________
         print "Contracts the Fnooblatz display by one row."
         return
     if help_with == 5:
-        print "Moves everything on the display one column to the right."
+        print "Rotates columns according to the rotation direction."
         return
     if help_with == 6:
-        print "Moves everything on the display one row down."
+        print "Rotates rows according to the rotation direction."
         return
     if help_with == 7:
         print "Doesn't do anything (except alternate the alternator, etc)."
@@ -376,6 +385,9 @@ ________
         return
     if help_with == 21:
         print "Goes down unless the cursor is at a '-'."
+        return
+    if help_with == 22:
+        print "Reverses the rotation direction."
         return
     print "Never heard of that, sorry. :("
 
@@ -612,6 +624,21 @@ b
 |
 |
 """, "Couldn't hit wall going down and turn it into a 'b'.")
+        fnoo.press_button(0)
+        fnoo.execute_sequence([1, 2, 8, 19, 8, 8, 21, 8, 8, 18, 8, 8])
+        self.grade(fnoo.printable_display() == """
+-|
+|-
+""", "Couldn't draw little swirl.")
+        fnoo.execute_sequence([1,2,1,2]) # Expand a little.
+        fnoo.press_button(22) # Reverse rotation.
+        fnoo.execute_sequence([5,6,5,6,5,6]) # Rotate back around to the middle. 
+        self.grade(fnoo.printable_display() == """
+****
+*-|*
+*|-*
+****
+""", "Couldn't move swirl to the middle by reversing rotation direction.")
         fnoo.press_button(0) # Leave the Fnooblatz clean! 
         print
         print "Passed", self.tests_score, "tests out of", self.total_tests, "!"

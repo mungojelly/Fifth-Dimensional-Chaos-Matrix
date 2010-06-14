@@ -52,6 +52,8 @@ A_ROUND_STICK = [6,7,7,7,8,8,8,9,10,11,11,17,18,18,19,19,19,19,
                  19,19,19,19,19,19,19,20,20,21,21,99999]
 A_ROUND_RAIN = [5,7,7,7,8,8,8,9,10,11,11,17,18,18,19,19,19,19,
                 19,19,19,19,20,20,21,21,21,21,21,21,21,21,99999]
+ROTATIONAL = [5,6,7,7,8,9,10,11,22,22,99999]
+ROTATIONAL_MOVEY = [5,6,7,7,8,9,10,11,18,19,20,21,22,22,99999]
 DISTRIBUTIONS = [DIST_BEGIN, DIST_BEGIN_NO_AT, 
                  DIST_BEGIN_ALT, DIST_BEGIN_ALT_NO_AT,
                  DIST_BEGIN_NO_LR, DIST_BEGIN_NO_AT_NO_LR,
@@ -62,7 +64,7 @@ DISTRIBUTIONS = [DIST_BEGIN, DIST_BEGIN_NO_AT,
                  SPARSELY_ABISH, VERY_SPARSELY_ABISH,
                  ONLY_A, ONLY_B, LEFT_SIDE, TOP_SHIFT,
                  SIDE_STICK, UPDOWN_STICK, A_ROUND_STICK,
-                 A_ROUND_RAIN]
+                 A_ROUND_RAIN, ROTATIONAL, ROTATIONAL_MOVEY]
 
 # Some distributions for using the background processor. 
 BACKGROUNDER = [8,8,8,11,11,11,99999]
@@ -80,12 +82,15 @@ AROUND_PUSHER = [18,19,20,21]
 SUPER_SPACEY_DOWNER = [11,11,11,11,11,11,11,11,11,11,11,11,11,
                        11,11,11,11,11,11,11,11,11,11,11,11,11,
                        21,21,21,21,21,21,21,21,21,21,21,21,21]
+ROTATION_SHIFTER = [7,7,7,7,7,7,22]
+ROTATION_TWIDDLER = [22]
 BACKGROUND_DISTRIBUTIONS = [BACKGROUNDER, SPACER_OUT, 
                             A_BACKGROUND, B_BACKGROUND, BG_ATER,
                             BG_CURSOR, BG_CURSOR_CORNERER,
                             LEFT_PUSHER, RIGHT_PUSHER,
                             UP_PUSHER, DOWN_PUSHER, AROUND_PUSHER,
-                            SUPER_SPACEY_DOWNER]
+                            SUPER_SPACEY_DOWNER, ROTATION_SHIFTER,
+                            ROTATION_TWIDDLER]
 
 import fnooblatz1000
 
