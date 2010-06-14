@@ -252,6 +252,33 @@ class Fnooblatz1000(object):
             self.cursor_column = 0
             return
         # An orderly instruction for finding one's place.
+        if button_number == 18:
+            self.check_cursor_bounds()
+            if self.display[self.cursor_row][self.cursor_column] != '|':
+                self.cursor_column -= 1
+                self.check_cursor_bounds()
+            return
+        if button_number == 19:
+            self.check_cursor_bounds()
+            if self.display[self.cursor_row][self.cursor_column] != '|':
+                self.cursor_column += 1
+                self.check_cursor_bounds()
+            return
+        if button_number == 20:
+            self.check_cursor_bounds()
+            if self.display[self.cursor_row][self.cursor_column] != '-':
+                self.cursor_row -= 1
+                self.check_cursor_bounds()
+            return
+        if button_number == 21:
+            self.check_cursor_bounds()
+            if self.display[self.cursor_row][self.cursor_column] != '-':
+                self.cursor_row += 1
+                self.check_cursor_bounds()
+            return
+        # The above instructions allow you to travel easily in 
+        # all four directions, while also allowing you to safely 
+        # contain yourself in a box-- or a maze perhaps!
         self.display[0][0] = '@' 
         # Error signal for unpressableness, 
         # since if we've reached this point, 
@@ -337,6 +364,18 @@ ________
         return
     if help_with == 17:
         print "Moves the cursor to the upper left corner."
+        return
+    if help_with == 18:
+        print "Goes left unless the cursor is at a '|'."
+        return
+    if help_with == 19:
+        print "Goes right unless the cursor is at a '|'."
+        return
+    if help_with == 20:
+        print "Goes up unless the cursor is at a '-'."
+        return
+    if help_with == 21:
+        print "Goes down unless the cursor is at a '-'."
         return
     print "Never heard of that, sorry. :("
 
@@ -524,6 +563,55 @@ aabb
         fnoo.press_button(8)
         self.grade(fnoo.display[0][0] == '-',
                    "Couldn't paint dash in upper left corner by pressing 17.")
+        fnoo.execute_sequence([10,7,10,7,10,7,8])
+        self.grade(fnoo.printable_display() == """
+---|--
+""", "Couldn't put a | on the line of dashes.")
+        fnoo.press_button(17) 
+        fnoo.execute_sequence([19,19,19,19,19]) # Go right a bunch, but hit the wall.
+        fnoo.press_button(14)
+        self.grade(fnoo.printable_display() == """
+---b--
+""", "Couldn't hit a wall going right and then turn it into a b.")
+        fnoo.press_button(0)
+        fnoo.execute_sequence([1,1,1,1,1,10,8,10,8,10,8,10,8,10,8,17,8,10,7,8,7,10,7,10,7,10])
+        self.grade(fnoo.printable_display() == """
+-|----
+""", "Couldn't print second wall to hit.")
+        fnoo.execute_sequence([18,18,18,18,18]) # Go left a bunch, but hit the wall.
+        fnoo.press_button(14)
+        self.grade(fnoo.printable_display() == """
+-b----
+""", "Couldn't hit a wall going left and then turn it into a b.")
+        fnoo.press_button(0)
+        draw_up_down_wall = [2, 2, 2, 8, 7, 9, 7, 8, 7, 9, 7, 8, 
+                             7, 9, 7, 8, 17, 8, 7, 9, 8, 9, 7, 9]
+        fnoo.execute_sequence(draw_up_down_wall)
+        self.grade(fnoo.printable_display() == """
+|
+-
+|
+|
+""", "Couldn't draw wall for going up-down.")
+        fnoo.execute_sequence([20,20,20]) # Go up and hit the wall.
+        fnoo.press_button(14)
+        self.grade(fnoo.printable_display() == """
+|
+b
+|
+|
+""", "Couldn't hit wall going up and turn it into a 'b'.")
+        fnoo.press_button(0)
+        fnoo.execute_sequence(draw_up_down_wall)
+        fnoo.press_button(17) # Go home.
+        fnoo.execute_sequence([21,21,21]) # Go down and hit the wall.
+        fnoo.press_button(14)
+        self.grade(fnoo.printable_display() == """
+|
+b
+|
+|
+""", "Couldn't hit wall going down and turn it into a 'b'.")
         fnoo.press_button(0) # Leave the Fnooblatz clean! 
         print
         print "Passed", self.tests_score, "tests out of", self.total_tests, "!"
