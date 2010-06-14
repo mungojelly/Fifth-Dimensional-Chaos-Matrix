@@ -32,6 +32,7 @@
 
 import collections 
 from doohickey import Doohickey
+import alphabetrotator
 
 class Fnooblatz1000(object):
     def __init__(self):
@@ -72,6 +73,7 @@ class Fnooblatz1000(object):
         self.display = collections.deque()
         self.display.append(empty_row)
         self.buttons_pressed = collections.deque()
+        self.cursor_stack = collections.deque()
         self.background_instructions = collections.deque()
         self.background_current_instruction = -1 # So it starts at zero. 
         self.background_processing_on = False
@@ -299,6 +301,32 @@ class Fnooblatz1000(object):
             return
         # Allows you to remember a character for a little 
         # while.  Useful for smearing things around! 
+        if button_number == 25:
+            self.check_cursor_bounds()
+            self.display[self.cursor_row][self.cursor_column] = \
+                alphabetrotator.rotate(self.display[self.cursor_row][self.cursor_column])
+            return
+        # Combined with the Doohickey, which prints out 
+        # 'a's and 'b's, this allows you to write any 
+        # letter of the alphabet! 
+        if button_number == 26:
+            self.check_cursor_bounds()
+            if self.display[self.cursor_row][self.cursor_column] == ' ':
+                return # Do nothing to blank spaces. 
+            self.display[self.cursor_row][self.cursor_column] = 'g'
+            return
+        # This is useful for GIG.
+        if button_number == 27:
+            self.cursor_stack.append((self.cursor_row, self.cursor_column))
+            if len(self.cursor_stack) > 1024:
+                self.cursor_stack.popleft()
+            return
+        if button_number == 28:
+            if len(self.cursor_stack) > 0:
+                (self.cursor_row, self.cursor_column) = self.cursor_stack.pop()
+            return
+        # Whereever you go, there you are, but it's also nice 
+        # to remember where else you've been recently. 
         self.display[0][0] = '@' 
         # Error signal for unpressableness, 
         # since if we've reached this point, 
@@ -405,6 +433,18 @@ ________
         return
     if help_with == 24:
         print "Prints the remembered character."
+        return
+    if help_with == 25:
+        print "Rotates the character at the cursor through the alphabet."
+        return
+    if help_with == 26:
+        print "Usually puts a 'g' at the cursor, but leaves blank spaces blank."
+        return
+    if help_with == 27:
+        print "Push the current cursor location onto the cursor location stack."
+        return
+    if help_with == 28:
+        print "Pop a location off the cursor location stack and go to it."
         return
     print "Never heard of that, sorry. :("
 
@@ -669,6 +709,38 @@ b
 ba
 ab
 """, "Couldn't remember characters and repaint them.")
+        fnoo.press_button(0)
+        fnoo.press_button(14)
+        fnoo.press_button(25)
+        self.grade(fnoo.display[0][0] == 'c',
+                   "Couldn't use alphabetrotator to change 'b' to 'c'.")
+        fnoo.execute_sequence([25,25,25,25,25,25,25,25,25,25,25,25,25,
+                               25,25,25,25,25,25,25,25,25,25])
+        self.grade(fnoo.display[0][0] == 'z',
+                   "Couldn't use alphabetrotator to advance letter to 'z'.")
+        fnoo.press_button(25)
+        self.grade(fnoo.display[0][0] == 'a',
+                   "Using alphabetrotator on 'z' didn't give 'a'.")
+        fnoo.press_button(26)
+        self.grade(fnoo.display[0][0] == 'g',
+                   "Pressing 26 didn't turn an 'a' into a 'g'.")
+        fnoo.press_button(11)
+        fnoo.press_button(26)
+        self.grade(fnoo.display[0][0] == ' ',
+                   "Pressing 26 on a blank space didn't leave it blank.")
+        fnoo.press_button(0)
+        fnoo.execute_sequence([1,2])
+        fnoo.press_button(27) # Push 0,0 on the stack.
+        fnoo.press_button(19)
+        fnoo.press_button(27) # Push 0,1 on the stack.
+        fnoo.press_button(21) 
+        fnoo.press_button(27) # Push 1,1 on the stack.
+        fnoo.press_button(18)
+        fnoo.execute_sequence([13,28,12,28,12,28,12])
+        self.grade(fnoo.printable_display() == """
+ba
+ab
+""", "Couldn't print baab square by stack push-popping!")
         fnoo.press_button(0) # Leave the Fnooblatz clean! 
         print
         print "Passed", self.tests_score, "tests out of", self.total_tests, "!"
