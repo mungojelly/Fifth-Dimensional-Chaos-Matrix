@@ -18,6 +18,7 @@ from fnooblatz1000 import Fnooblatz1000
 
 commands = {
 'a': [13],
+'alphabetrotate': [25],
 'b': [14],
 'c': ['b', 25],
 'd': ['c', 25],
@@ -54,11 +55,13 @@ commands = {
               'uuu', 'donut'],
 'memorize': [23],
 'n': ['m', 25],
+'nop': [7],
 'o': ['n', 25],
 'p': ['o', 25], 
 'q': ['p', 25],
 'r': ['q', 25],
 'recall': [24],
+'reset': [0],
 'right': [19],
 'rightspace': ['right', 'space'],
 'rr': ['right', 'right'],
@@ -82,9 +85,7 @@ commands = {
 }
 
 class Fnooblatz2000(object):
-    def __Init__(self):
-        self.reset_everything()
-    def reset(self):
+    def __init__(self):
         self.fnoo = Fnooblatz1000()
     def do(self,command_list):
         expanded_command = self.expand(command_list)
@@ -111,7 +112,6 @@ def main(stdscr):
     command_bar.stripspaces = True
     display_pad = curses.newpad(max_y - 2, max_x - 1)
     fn = Fnooblatz2000()
-    fn.reset()
     fn.fnoo.set_height(max_y - 2)
     fn.fnoo.set_width(max_x - 2)
     while True:
