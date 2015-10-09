@@ -13,6 +13,7 @@ MIN_SEQUENCE_LENGTH = 1
 MAX_SEQUENCE_LENGTH = 5000
 MIN_BACKGROUND_SEQUENCE_LENGTH = 1
 MAX_BACKGROUND_SEQUENCE_LENGTH = 5000
+SLEEP_TIME = 0.07
 RESET_TIME = 17
 REPEAT_TIME = 1.7
 REFRESH_TIME = 0.17
@@ -169,6 +170,7 @@ class RandomRunner(object):
         self.fnoo.print_curses(self.stdscr)
         display_refreshed = time.time()
         while True:
+            time.sleep(SLEEP_TIME)
             self.fnoo.execute_sequence(self.sequence)
             if time.time() - fnooblatz_reset > RESET_TIME:
                 self.reset_fnooblatz()
